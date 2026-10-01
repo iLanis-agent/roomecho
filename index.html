@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoomEcho - Why Your Room Sounds Echoey</title>
+<meta name="description" content="Estimate a room's reverberation time (RT60) from its size and materials, and how many acoustic panels fix it. Runs in your browser.">
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#1b1722; color:#ece8f4; line-height:1.6; }
+  .wrap { max-width:690px; margin:0 auto; padding:48px 20px 60px; }
+  .logo { font-size:46px; font-weight:800; } .logo span { color:#c78bff; }
+  .tag { font-size:19px; margin-top:10px; color:#c9c2d8; }
+  .cta { display:inline-block; margin-top:26px; background:#c78bff; color:#1b1722; font-weight:700; padding:14px 30px; border-radius:12px; text-decoration:none; }
+  h2 { font-size:21px; margin:40px 0 10px; } p, li { color:#c0b9d0; margin-bottom:8px; } ul { margin-left:20px; }
+  .demo { margin-top:26px; background:#251f30; border-radius:14px; padding:18px; display:flex; gap:18px; flex-wrap:wrap; }
+  .demo div { flex:1; min-width:140px; } .demo b { display:block; font-size:30px; color:#c78bff; }
+  footer { margin-top:50px; font-size:13px; color:#8f87a0; } a { color:#c78bff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">Room<span>Echo</span></div>
+  <div class="tag">Hard walls, bare floors, and your voice bounces around like it is in a stairwell. RoomEcho measures that bounce on paper and tells you what to add.</div>
+  <a class="cta" href="app.html">Check my room &rarr;</a>
+  <div class="demo"><div><b>1.20 s</b>bare 5 x 4 m living room</div><div><b>0.43 s</b>same room with thick carpet and curtains</div></div>
+  <h2>How it works</h2>
+  <p>Reverberation time is how long sound takes to fade by 60 dB. Sabine's equation gives it from the room volume and the total absorption of every surface: RT60 = 0.161 x V / A. Rugs, curtains, ceiling tiles and people soak up sound; concrete, glass and tile reflect it.</p>
+  <h2>What you get</h2>
+  <ul>
+    <li>RT60 by Sabine and Eyring from your dimensions, materials, windows and people</li>
+    <li>Targets for classrooms (ANSI S12.60), living rooms, offices and home studios</li>
+    <li>The area of acoustic panels needed to reach the target</li>
+    <li>A surface-by-surface absorption table, five ready presets</li>
+    <li>Runs fully in your browser, nothing is sent anywhere</li>
+  </ul>
+  <footer>Absorption coefficients are typical mid-frequency values, approximate. Real rooms vary. Sources: <a href="https://www.montana.edu/rmaher/eele217_fl19/lectures/lecture_12a.html">Sabine equation (Montana State)</a> &middot; <a href="https://acousticalsociety.org/wp-content/uploads/2022/01/Classroom_Acoustics_for_Architects_4_18_15.pdf">ASA classroom acoustics</a><br>App Factory project. <a href="https://github.com/iLanis-agent/roomecho">Code</a></footer>
+</div>
+</body>
+</html>
