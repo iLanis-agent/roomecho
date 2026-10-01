@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoomEcho - Why Your Room Sounds Echoey</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#1b1722; color:#ece8f4; line-height:1.5; }
+  .wrap { max-width:780px; margin:0 auto; padding:24px 16px 60px; }
+  h1 { font-size:27px; } h1 span { color:#c78bff; }
+  .sub { color:#a79fb8; margin:4px 0 18px; font-size:14px; }
+  .card { background:#251f30; border:1px solid #372e47; border-radius:14px; padding:16px; margin-bottom:16px; }
+  h2 { font-size:15px; margin-bottom:10px; }
+  .presets button { background:#372e47; color:#ece8f4; border:0; border-radius:8px; padding:8px 12px; cursor:pointer; font-size:13px; margin:0 6px 6px 0; }
+  .presets button:hover { background:#493c5f; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; }
+  label { font-size:12px; color:#a79fb8; display:block; margin-bottom:3px; }
+  input, select { width:100%; padding:8px; border:1px solid #473c5a; border-radius:8px; font-size:14px; background:#17131d; color:#ece8f4; }
+  .out { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; }
+  .m { background:#1b1722; border-radius:12px; padding:12px; }
+  .m .k { font-size:11px; text-transform:uppercase; letter-spacing:.5px; color:#a79fb8; }
+  .m .v { font-size:28px; font-weight:800; margin:2px 0; } .m .s { font-size:12px; color:#a79fb8; }
+  .good{color:#58d68d;} .warn{color:#f5b041;} .bad{color:#ec7063;}
+  .scale { position:relative; height:16px; border-radius:8px; margin:16px 0 4px; background:linear-gradient(90deg,#58d68d 0%,#58d68d 25%,#f5b041 25%,#f5b041 45%,#ec7063 45%); }
+  .scale i { position:absolute; top:-5px; width:4px; height:26px; background:#fff; border-radius:2px; transition:left .2s; }
+  .scale b { position:absolute; top:-5px; width:2px; height:26px; background:#c78bff; }
+  .ticks { display:flex; justify-content:space-between; font-size:11px; color:#a79fb8; }
+  table { width:100%; border-collapse:collapse; font-size:13px; margin-top:6px; } td, th { padding:5px 4px; text-align:left; border-bottom:1px solid #372e47; } th { color:#a79fb8; font-weight:600; font-size:11px; text-transform:uppercase; }
+  .note { font-size:12px; color:#a79fb8; margin-top:10px; } a { color:#c78bff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Room<span>Echo</span></h1>
+  <div class="sub">Echo is reverberation: how long sound lingers after the source stops. Describe a room, see its reverberation time (RT60), and how much absorbing material would fix it.</div>
+
+  <div class="card"><h2>Start from a room</h2><div class="presets" id="presets"></div></div>
+
+  <div class="card">
+    <h2>The room</h2>
+    <div class="grid">
+      <div><label>Length (m)</label><input type="number" id="l" min="1" step="0.1" value="5"></div>
+      <div><label>Width (m)</label><input type="number" id="w" min="1" step="0.1" value="4"></div>
+      <div><label>Height (m)</label><input type="number" id="h" min="1" step="0.1" value="2.5"></div>
+      <div><label>Window area (m&sup2;)</label><input type="number" id="win" min="0" step="0.5" value="4"></div>
+      <div><label>People (seated)</label><input type="number" id="ppl" min="0" value="2"></div>
+      <div><label>Floor</label><select id="floor"></select></div>
+      <div><label>Ceiling</label><select id="ceiling"></select></div>
+      <div><label>Walls</label><select id="wall"></select></div>
+      <div><label>Soft furnishings: heavy curtains (m&sup2;)</label><input type="number" id="curt" min="0" step="0.5" value="0"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>How it sounds</h2>
+    <div class="grid" style="margin-bottom:12px"><div><label>What is the room for?</label><select id="use"></select></div></div>
+    <div class="out" id="out"></div>
+    <div class="scale" id="scale"><i id="mk"></i><b id="tg"></b></div>
+    <div class="ticks"><span>0 s (dead)</span><span>0.5</span><span>1.0</span><span>1.5</span><span>2 s+ (echoey)</span></div>
+    <table id="tbl"></table>
+  </div>
+
+  <div class="note">
+    Sabine: RT60 = 0.161 x V / A, with A the sum of surface area x absorption coefficient (metric). Eyring is more accurate when the room is quite absorbent. Absorption values are typical mid-frequency (about 500 Hz) numbers, approximate; real materials vary and low frequencies behave differently. Targets: classroom limits 0.6 s (up to 283 m3) and 0.7 s (283 to 566 m3) from ANSI/ASA S12.60; others are rules of thumb. Real rooms with furniture are not perfectly diffuse, so treat results as a guide.
+    Sources: <a href="https://www.montana.edu/rmaher/eele217_fl19/lectures/lecture_12a.html">Sabine equation (Montana State)</a> &middot; <a href="https://acousticalsociety.org/wp-content/uploads/2022/01/Classroom_Acoustics_for_Architects_4_18_15.pdf">ASA classroom acoustics</a>
+  </div>
+</div>
+<script src="engine.js"></script>
+<script>
+(function(){
+  var E = RoomEcho, $ = function(i){ return document.getElementById(i); };
+  ['floor','ceiling','wall'].forEach(function(id){ var s = $(id); Object.keys(E.MATERIALS).forEach(function(k){ var o = document.createElement('option'); o.value = k; o.textContent = E.MATERIALS[k].name + ' ('+E.MATERIALS[k].a.toFixed(2)+')'; s.appendChild(o); }); });
+  Object.keys(E.TARGETS).forEach(function(k){ var o = document.createElement('option'); o.value = k; o.textContent = E.TARGETS[k].name + ': under '+E.TARGETS[k].max+' s'; $('use').appendChild(o); });
+  $('floor').value = 'wood'; $('ceiling').value = 'gypsum'; $('wall').value = 'gypsum'; $('use').value = 'living';
+  function card(k, v, s, c){ return '<div class="m"><div class="k">'+k+'</div><div class="v '+(c||'')+'">'+v+'</div><div class="s">'+s+'</div></div>'; }
+  function f(x){ return isFinite(x) ? x.toFixed(2)+' s' : 'no decay'; }
+  function update(){
+    var l = +$('l').value, w = +$('w').value, h = +$('h').value, V = E.volume(l,w,h);
+    var items = E.roomItems(l, w, h, { floor:$('floor').value, ceiling:$('ceiling').value, wall:$('wall').value }, +$('win').value, +$('ppl').value);
+    var cu = Math.max(0, +$('curt').value);
+    if (cu > 0){ var wl = items.filter(function(i){ return i.name === 'Walls'; })[0]; var c = Math.min(cu, wl.area); wl.area -= c; items.push({ name:'Curtains', area:c, a:E.MATERIALS.curtain.a }); }
+    var A = E.totalAbsorption(items), S = items.filter(function(i){ return i.name !== 'People'; }).reduce(function(a,i){ return a + i.area; }, 0);
+    var Ts = E.sabine(V, A), Te = E.eyring(V, S, A), tgt = E.TARGETS[$('use').value].max;
+    var ratio = Ts / tgt, cls = ratio <= 1 ? 'good' : ratio <= 1.5 ? 'warn' : 'bad';
+    var pa = E.panelArea(V, A, tgt, E.MATERIALS.panel.a, E.MATERIALS.gypsum.a);
+    $('out').innerHTML = card('RT60 (Sabine)', f(Ts), ratio <= 1 ? 'meets the target' : (ratio).toFixed(1)+'x the target', cls) + card('RT60 (Eyring)', f(Te), 'for absorbent rooms') +
+      card('Absorption now', A.toFixed(1)+' m\u00b2', 'sabins, '+V.toFixed(0)+' m\u00b3 room') +
+      card('Panels to reach target', pa > 0 ? pa.toFixed(1)+' m\u00b2' : 'none needed', pa > 0 ? 'of 50 mm panels on bare wall ('+Math.round(pa/Math.max(S-2*l*w,1)*100)+'% of wall area)' : 'already under '+tgt+' s', pa > 0 ? 'warn' : 'good');
+    var pos = Math.min(Ts/2, 1)*100; $('mk').style.left = 'calc('+pos+'% - 2px)'; $('tg').style.left = 'calc('+Math.min(tgt/2,1)*100+'% - 1px)';
+    $('tbl').innerHTML = '<tr><th>Surface</th><th>Area m\u00b2</th><th>Coeff.</th><th>Absorption</th></tr>' + items.map(function(i){ return '<tr><td>'+i.name+'</td><td>'+i.area.toFixed(1)+'</td><td>'+i.a.toFixed(2)+'</td><td>'+(i.area*i.a).toFixed(2)+'</td></tr>'; }).join('');
+  }
+  var P = { 'Bare living room':{l:5,w:4,h:2.5,win:4,ppl:2,floor:'wood',ceiling:'gypsum',wall:'gypsum',curt:0,use:'living'},
+    'Cozy living room':{l:5,w:4,h:2.5,win:4,ppl:2,floor:'rug',ceiling:'gypsum',wall:'gypsum',curt:6,use:'living'},
+    'Classroom':{l:9,w:7,h:3,win:12,ppl:25,floor:'tile',ceiling:'gypsum',wall:'gypsum',curt:0,use:'classroom'},
+    'Classroom with ceiling tile':{l:9,w:7,h:3,win:12,ppl:25,floor:'tile',ceiling:'acoustic',wall:'gypsum',curt:0,use:'classroom'},
+    'Empty garage studio':{l:6,w:5,h:2.7,win:0,ppl:1,floor:'concrete',ceiling:'concrete',wall:'concrete',curt:0,use:'studio'} };
+  var pr = $('presets');
+  Object.keys(P).forEach(function(k){ var b = document.createElement('button'); b.textContent = k; b.onclick = function(){ var p = P[k]; Object.keys(p).forEach(function(f){ $(f).value = p[f]; }); update(); }; pr.appendChild(b); });
+  ['l','w','h','win','ppl','floor','ceiling','wall','curt','use'].forEach(function(i){ $(i).oninput = update; $(i).onchange = update; });
+  update();
+})();
+</script>
+</body>
+</html>
